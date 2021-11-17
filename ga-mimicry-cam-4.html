@@ -22,17 +22,30 @@ var PATH_WING = "objs/Fbugs2w.obj";
 
     <script src="js/three.min.js"></script>
     <script src="js/OBJLoader.js"></script>
-
+<style>
+.hidden-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -99;
+}
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+</style>
   </head>
 
   <body>
     <div id="run"></div>
-    <table>
-      <tr><td>Generated Texture</td><td>Render</td><td>Render (w/ BG)</td><td>Best Render</td></tr>
-      <tr><td id="c0"></td><td id="c1"></td><td id="c2"></td><td id="c3"></td></tr>
-    </table>
-    <div id="info"></div>
-    <div id="gene" style="width:100%; word-break: break-all; font-family: monospace; font-size: 8px;"></div>
+    <div class="hidden-canvas" id="c1"></div>
+    <div class="canvas" id="c2"></div>
+    <div class="hidden-canvas" id="c3"></div>
+    <div class="hidden-canvas" id="c0"></div>
+    <!-- <div id="info"></div>
+    <div id="gene" style="width:100%; word-break: break-all; font-family: monospace; font-size: 8px;"></div> -->
   </body>
 
 <script>
@@ -57,8 +70,8 @@ canvc.height = IMG_W;
 
 var canv0 = document.createElement("canvas");
 var ctx0 = canv0.getContext('2d');
-canv0.width = IMG_W;
-canv0.height = IMG_W;
+canv0.width = document.body.clientWidth;
+canv0.height = document.body.clientHeight;
 
 
 var canv1 = document.createElement("canvas");
@@ -145,13 +158,15 @@ function loadBG(url,cb){
 }
 
 function fitness(bg,obj,B){
-  ctx0.drawImage(bg,0,0,IMG_W,IMG_W);
+  let width = ctx0.canvas.clientWidth;
+  let height = ctx0.canvas.clientHeight;
+  ctx0.drawImage(bg, 0, 0, width, height);
   
   var dat0 = ctx0.getImageData(0,0,IMG_W,IMG_W).data;
   
   renderBinStr(obj,B)
   renderer.render(scene, camera);
-  ctx0.drawImage(renderer.domElement,0,0,IMG_W,IMG_W);
+  ctx0.drawImage(renderer.domElement,0,0,width, height);
   
   var dat1 = ctx0.getImageData(0,0,IMG_W,IMG_W).data;
   
@@ -197,7 +212,7 @@ function selection(bg,obj,genes,cb){
     i++;
     
     function gui(){
-      document.getElementById("info").innerHTML = `epoch=${epoch}; population=${genes.length}; min_loss=${f}; avg_loss=${af/(i+1)}`
+      // document.getElementById("info").innerHTML = `epoch=${epoch}; population=${genes.length}; min_loss=${f}; avg_loss=${af/(i+1)}`
     }
 
     if (i >= genes.length){
@@ -228,7 +243,7 @@ function selection(bg,obj,genes,cb){
     fitness(bg,obj,g2[0].bin);
     ctx2.drawImage(canv0,0,0,IMG_W,IMG_W);
 
-    document.getElementById("gene").innerHTML = g2[0].bin.join("");
+    // document.getElementById("gene").innerHTML = g2[0].bin.join("");
     
     // console.log(sb[0])
 
@@ -419,9 +434,9 @@ navigator.mediaDevices.getUserMedia({audio:false,video:true}).then(function(stre
         anim();
       }
 
-      // run();
-      window.run = run;
-      var btn = document.createElement("button");
+      run();
+      // window.run = run;
+      /*var btn = document.createElement("button");
       btn.onclick = run;
       btn.innerHTML = "Run"
       document.getElementById("run").appendChild(btn)
@@ -430,11 +445,7 @@ navigator.mediaDevices.getUserMedia({audio:false,video:true}).then(function(stre
       document.getElementById("run").appendChild(fs);
       fs.onclick=function(){
         canv0.requestFullscreen()
-      }
-      var stp = document.createElement("button");
-      stp.onclick = stop;
-      stp.innerHTML = "Stop"
-      document.getElementById("run").appendChild(stp)
+      }*/
 
     })
   })
